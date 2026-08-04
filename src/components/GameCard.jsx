@@ -365,7 +365,7 @@ export default function GameCard({
           initial={{ opacity: 0, scale: 0.97 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
-          className={`glass-panel rounded-3xl p-6 sm:p-8 border relative overflow-hidden transition-all duration-300 shadow-2xl ${
+          className={`glass-panel rounded-3xl p-4 sm:p-8 border relative overflow-hidden transition-all duration-300 shadow-2xl ${
             isFireMode ? 'fire-mode-glow bg-[#080f20]/95' : 'border-emerald-500/30'
           }`}
         >
@@ -374,22 +374,22 @@ export default function GameCard({
             <motion.div 
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
-              className="mb-5 py-2 px-4 rounded-full bg-gradient-to-r from-amber-500 via-emerald-400 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-glow-neon animate-fire-pulse"
+              className="mb-4 py-1.5 px-3 sm:py-2 sm:px-4 rounded-full bg-gradient-to-r from-amber-500 via-emerald-400 to-cyan-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-glow-neon animate-fire-pulse"
             >
-              <Flame className="w-4 h-4 fill-slate-950" />
-              <span>🔥 HYPERDRIVE FIRE MODE (2X POINTS MULTIPLIER) 🔥</span>
+              <Flame className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-slate-950" />
+              <span>🔥 HYPERDRIVE FIRE MODE (2X MULTIPLIER) 🔥</span>
             </motion.div>
           )}
 
           {/* GAMEPLAY METRICS BAR */}
-          <div className="flex items-center justify-between gap-3 mb-5 text-xs font-bold">
-            <div className="flex items-center gap-2">
-              <span className="px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-1.5 shadow-sm">
+          <div className="flex items-center justify-between gap-2 mb-4 text-xs font-bold">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 flex items-center gap-1 sm:gap-1.5 shadow-sm text-[11px] sm:text-xs">
                 <Brain className="w-3.5 h-3.5 text-emerald-400" />
-                Level {level}
+                Lvl {level}
               </span>
               {streak > 1 && (
-                <span className="px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 flex items-center gap-1.5 shadow-sm">
+                <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 flex items-center gap-1 sm:gap-1.5 shadow-sm text-[11px] sm:text-xs">
                   <Flame className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
                   {streak} Streak
                 </span>
@@ -397,23 +397,23 @@ export default function GameCard({
             </div>
 
             <div className="text-right">
-              <span className="text-slate-400 uppercase tracking-widest text-[10px] block font-semibold">Score</span>
-              <div className="text-2xl font-black text-white font-mono tracking-tight">{currentScore}</div>
+              <span className="text-slate-400 uppercase tracking-widest text-[9px] sm:text-[10px] block font-semibold">Score</span>
+              <div className="text-xl sm:text-2xl font-black text-white font-mono tracking-tight">{currentScore}</div>
             </div>
           </div>
 
           {/* TIMER BAR & COUNTDOWN */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between text-xs font-semibold mb-2">
-              <span className="flex items-center gap-1.5 text-slate-300">
-                <Clock className="w-4 h-4 text-emerald-400" />
-                {isFrozen ? '❄️ TIMER FROZEN' : 'TIME REMAINING'}
+          <div className="mb-4 sm:mb-6">
+            <div className="flex items-center justify-between text-xs font-semibold mb-1.5 sm:mb-2">
+              <span className="flex items-center gap-1.5 text-slate-300 text-[11px] sm:text-xs">
+                <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400" />
+                {isFrozen ? '❄️ FROZEN' : 'TIME'}
               </span>
-              <span className={`font-mono text-base font-bold ${timeRemaining <= 5 ? 'text-rose-400 animate-pulse' : 'text-slate-200'}`}>
+              <span className={`font-mono text-sm sm:text-base font-bold ${timeRemaining <= 5 ? 'text-rose-400 animate-pulse' : 'text-slate-200'}`}>
                 {timeRemaining}s
               </span>
             </div>
-            <div className="w-full h-3.5 bg-slate-900/90 rounded-full overflow-hidden p-0.5 border border-slate-800">
+            <div className="w-full h-3 sm:h-3.5 bg-slate-900/90 rounded-full overflow-hidden p-0.5 border border-slate-800">
               <motion.div
                 initial={{ width: '100%' }}
                 animate={{ width: `${timerRatio * 100}%` }}
@@ -424,13 +424,23 @@ export default function GameCard({
           </div>
 
           {/* MAIN EQUATION CARD */}
-          <div className="my-6 py-9 px-4 rounded-3xl bg-slate-950/80 border border-emerald-500/25 text-center relative shadow-inner group">
-            <div className="text-xs uppercase tracking-widest font-bold text-emerald-400/80 mb-3 flex items-center justify-center gap-1.5">
+          <div className="my-4 sm:my-6 py-6 sm:py-9 px-3 sm:px-4 rounded-3xl bg-slate-950/80 border border-emerald-500/25 text-center relative shadow-inner group">
+            <div className="text-[10px] sm:text-xs uppercase tracking-widest font-bold text-emerald-400/80 mb-2 sm:mb-3 flex items-center justify-center gap-1.5">
               <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-              Solve the Equation
+              <span>
+                {question.type === 'blitz' && '🔥 SPEED BLITZ MULTI-OP'}
+                {question.type === 'exponents' && '⚡ EXPONENTS & SQUARE ROOTS'}
+                {question.type === 'percent' && '📊 PERCENTAGES'}
+                {question.type === 'algebra' && '🔤 ALGEBRAIC EQUATION'}
+                {question.type === 'div' && '➗ DIVISION'}
+                {question.type === 'mul' && '✖️ MULTIPLICATION'}
+                {question.type === 'sub' && '➖ SUBTRACTION'}
+                {question.type === 'add' && '➕ ADDITION'}
+              </span>
             </div>
-            <div className="text-4xl sm:text-5xl font-black font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-white to-cyan-300 drop-shadow-md">
-              {question.promptText} = ?
+            <div className="text-3xl sm:text-5xl font-black font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-white to-cyan-300 drop-shadow-md flex items-center justify-center gap-2">
+              <span dangerouslySetInnerHTML={{ __html: question.promptText }} />
+              <span>= ?</span>
             </div>
 
             {/* Input display in Keypad Mode */}

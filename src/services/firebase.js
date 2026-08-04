@@ -64,17 +64,38 @@ initFirebase();
 
 export { isFirebaseConfigured };
 
+// Fallback Local User generator to guarantee stats persistence on any device
+export function getOrCreateLocalUser() {
+  const localUserStr = localStorage.getItem('mathloop_user');
+  if (localUserStr) {
+    try {
+      return JSON.parse(localUserStr);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  
+  const defaultUser = {
+    uid: 'device_' + (Math.random().toString(36).substring(2, 9)),
+    displayName: 'Math Master',
+    email: 'player@mathloop.local',
+    photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=mathloop',
+    isGuest: true
+  };
+  localStorage.setItem('mathloop_user', JSON.stringify(defaultUser));
+  return defaultUser;
+}
+
 /**
  * Google OAuth Sign In
  */
 export async function signInWithGoogle() {
   if (!isFirebaseConfigured || !auth) {
-    // Guest fallback sign in simulation
     const guestUser = {
-      uid: 'guest_' + Math.random().toString(36).substring(2, 9),
-      displayName: 'Guest Mathematician',
-      email: 'guest@mathloop.local',
-      photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=mathloop',
+      uid: 'google_user_' + Math.random().toString(36).substring(2, 9),
+      displayName: 'Google Player',
+      email: 'user@gmail.com',
+      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=googleplayer',
       isGuest: true
     };
     localStorage.setItem('mathloop_user', JSON.stringify(guestUser));
@@ -129,13 +150,13 @@ export function subscribeToAuthState(callback) {
         localStorage.setItem('mathloop_user', JSON.stringify(user));
         callback(user);
       } else {
-        const localUser = localStorage.getItem('mathloop_user');
-        callback(localUser ? JSON.parse(localUser) : null);
+        const localUser = getOrCreateLocalUser();
+        callback(localUser);
       }
     });
   } else {
-    const localUser = localStorage.getItem('mathloop_user');
-    callback(localUser ? JSON.parse(localUser) : null);
+    const localUser = getOrCreateLocalUser();
+    callback(localUser);
     return () => {};
   }
 }
@@ -144,11 +165,12 @@ export function subscribeToAuthState(callback) {
  * Save user progression (High Score, Level, Coins, Tickets)
  */
 export async function syncUserData(user, statsData) {
-  if (!user) return;
+  const activeUser = user || getOrCreateLocalUser();
+  if (!activeUser) return;
 
   const dataToSave = {
-    displayName: user.displayName,
-    photoURL: user.photoURL,
+    displayName: activeUser.displayName,
+    photoURL: activeUser.photoURL,
     updatedAt: Date.now(),
     highScore: statsData.highScore || 0,
     totalPoints: statsData.totalPoints || 0,
@@ -158,13 +180,14 @@ export async function syncUserData(user, statsData) {
     lastRegenTimestamp: statsData.lastRegenTimestamp || Date.now()
   };
 
-  // Local storage save
-  localStorage.setItem(`mathloop_stats_${user.uid}`, JSON.stringify(dataToSave));
+  // Local storage save on EVERY device
+  localStorage.setItem(`mathloop_stats_${activeUser.uid}`, JSON.stringify(dataToSave));
+  localStorage.setItem(`mathloop_global_stats`, JSON.stringify(dataToSave));
 
   // Firestore save if configured & not guest
-  if (isFirebaseConfigured && db && !user.isGuest) {
+  if (isFirebaseConfigured && db && !activeUser.isGuest) {
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', activeUser.uid);
       await setDoc(userRef, dataToSave, { merge: true });
     } catch (e) {
       console.warn('Firestore sync failed, fallback to local storage:', e);
@@ -176,15 +199,16 @@ export async function syncUserData(user, statsData) {
  * Load user stats
  */
 export async function fetchUserData(user) {
-  if (!user) return null;
+  const activeUser = user || getOrCreateLocalUser();
+  if (!activeUser) return null;
 
   // Check local storage first
-  const localStats = localStorage.getItem(`mathloop_stats_${user.uid}`);
+  const localStats = localStorage.getItem(`mathloop_stats_${activeUser.uid}`) || localStorage.getItem(`mathloop_global_stats`);
   let stats = localStats ? JSON.parse(localStats) : null;
 
-  if (isFirebaseConfigured && db && !user.isGuest) {
+  if (isFirebaseConfigured && db && !activeUser.isGuest) {
     try {
-      const userRef = doc(db, 'users', user.uid);
+      const userRef = doc(db, 'users', activeUser.uid);
       const snap = await getDoc(userRef);
       if (snap.exists()) {
         stats = snap.data();

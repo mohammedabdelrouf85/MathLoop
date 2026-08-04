@@ -80,7 +80,7 @@ export default function App() {
           tickets: state.tickets,
           lastRegenTimestamp: state.lastRegenTimestamp
         };
-        if (user) syncUserData(user, next);
+        syncUserData(user, next);
         return next;
       });
     };
@@ -107,7 +107,7 @@ export default function App() {
       lastRegenTimestamp: userStats.tickets === 5 ? Date.now() : userStats.lastRegenTimestamp
     };
     setUserStats(nextStats);
-    if (user) syncUserData(user, nextStats);
+    syncUserData(user, nextStats);
   };
 
   // Earn/Spend Brain Coins
@@ -115,7 +115,7 @@ export default function App() {
     setUserStats((prev) => {
       const nextCoins = Math.max(0, prev.coins + amount);
       const nextStats = { ...prev, coins: nextCoins };
-      if (user) syncUserData(user, nextStats);
+      syncUserData(user, nextStats);
       return nextStats;
     });
   };
@@ -132,7 +132,7 @@ export default function App() {
         highLevel: nextHighLevel,
         totalPoints: nextTotalPoints
       };
-      if (user) syncUserData(user, nextStats);
+      syncUserData(user, nextStats);
       return nextStats;
     });
   };
