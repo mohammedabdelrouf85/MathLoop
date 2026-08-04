@@ -66,14 +66,20 @@ export default function GameCard({
   // Question start timestamp for fast answer calculation
   const questionStartTimeRef = useRef(Date.now());
 
-  // Trigger confetti burst
+  // Trigger confetti burst safely
   const triggerConfetti = useCallback(() => {
-    confetti({
-      particleCount: 75,
-      spread: 80,
-      origin: { y: 0.6 },
-      colors: ['#00ffaa', '#10b981', '#06b6d4', '#8b5cf6', '#ffffff']
-    });
+    try {
+      const isMobile = window.innerWidth < 768;
+      confetti({
+        particleCount: isMobile ? 25 : 65,
+        spread: isMobile ? 50 : 80,
+        origin: { y: 0.6 },
+        disableForReducedMotion: true,
+        colors: ['#00ffaa', '#10b981', '#06b6d4', '#8b5cf6', '#ffffff']
+      });
+    } catch (e) {
+      // Ignore confetti errors on low-end mobile devices
+    }
   }, []);
 
   // Start new round
@@ -139,7 +145,10 @@ export default function GameCard({
   const handleAnswer = (selectedVal) => {
     if (!isPlaying || softFail || !question) return;
 
-    const isCorrect = Number(selectedVal) === Number(question.answer);
+    // Bulletproof precision match for choices vs correct answer
+    const valNum = Math.round(Number(selectedVal));
+    const ansNum = Math.round(Number(question.answer));
+    const isCorrect = valNum === ansNum || Math.abs(Number(selectedVal) - Number(question.answer)) < 0.01;
     const timeTaken = (Date.now() - questionStartTimeRef.current) / 1000;
 
     if (isCorrect) {

@@ -145,7 +145,7 @@ export function generateQuestion(level, streak = 0, adaptiveFactor = 1.0) {
       if (p === 25 || p === 75) baseVal = multiplier * 4;
       else if (p === 20) baseVal = multiplier * 5;
       else baseVal = multiplier * 10;
-      answer = (p / 100) * baseVal;
+      answer = Math.round((p / 100) * baseVal);
       promptText = `${p}% of ${baseVal}`;
       difficultyScore = Math.round(55 + p);
       break;
@@ -174,14 +174,17 @@ export function generateQuestion(level, streak = 0, adaptiveFactor = 1.0) {
     }
   }
 
+  // Ensure answer is clean integer
+  const finalAnswer = Math.round(Number(answer));
+
   // Generate 4 multiple choice options (including correct answer)
-  const choices = generateChoices(answer);
+  const choices = generateChoices(finalAnswer);
 
   return {
     id: Date.now() + Math.random(),
     type,
     promptText,
-    answer,
+    answer: finalAnswer,
     choices,
     difficultyScore,
     effectiveLevel
@@ -192,28 +195,35 @@ export function generateQuestion(level, streak = 0, adaptiveFactor = 1.0) {
  * Generates 4 distractor choices around the correct answer
  */
 function generateChoices(answer) {
-  const options = new Set([answer]);
+  const roundedAnswer = Math.round(Number(answer));
+  const options = new Set([roundedAnswer]);
 
-  const offsets = [-1, 1, -2, 2, -10, 10, -5, 5, -3, 3];
+  const offsets = [-1, 1, -2, 2, -10, 10, -5, 5, -3, 3, -4, 4];
   
   // Shuffle offsets
   offsets.sort(() => Math.random() - 0.5);
 
   for (const offset of offsets) {
     if (options.size >= 4) break;
-    const candidate = answer + offset;
-    if (candidate >= 0 && candidate !== answer) {
+    const candidate = roundedAnswer + offset;
+    if (candidate >= 0 && candidate !== roundedAnswer) {
       options.add(candidate);
     }
   }
 
   // Fallback random choices if set not full
   let attempts = 0;
-  while (options.size < 4 && attempts < 20) {
+  while (options.size < 4 && attempts < 40) {
     attempts++;
-    const r = answer + (Math.floor(Math.random() * 15) - 7);
-    if (r >= 0) options.add(r);
+    const delta = Math.floor(Math.random() * 16) - 8;
+    const r = roundedAnswer + (delta === 0 ? 1 : delta);
+    if (r >= 0 && r !== roundedAnswer) {
+      options.add(r);
+    }
   }
+
+  // GUARANTEE correct answer is present
+  options.add(roundedAnswer);
 
   // Return shuffled array of options
   return Array.from(options).sort(() => Math.random() - 0.5);

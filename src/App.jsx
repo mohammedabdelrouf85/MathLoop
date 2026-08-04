@@ -147,11 +147,11 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col justify-between text-slate-100 relative bg-[#070a12] cyber-grid-overlay overflow-x-hidden">
-      {/* Dynamic Ambient Background Glowing Blobs */}
+      {/* Dynamic Ambient Background Glowing Blobs (Mobile Optimized) */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 rounded-full bg-emerald-500/10 blur-[120px] animate-float-slow" />
-        <div className="absolute top-1/3 -right-40 w-[500px] h-[500px] rounded-full bg-cyan-500/10 blur-[150px] animate-float-slow" style={{ animationDelay: '-3s' }} />
-        <div className="absolute -bottom-40 left-1/4 w-96 h-96 rounded-full bg-purple-500/10 blur-[130px] animate-float-slow" style={{ animationDelay: '-5s' }} />
+        <div className="absolute -top-40 -left-40 w-80 h-80 rounded-full bg-emerald-500/10 blur-3xl opacity-70 animate-float-slow" />
+        <div className="absolute top-1/3 -right-40 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl opacity-70 animate-float-slow" style={{ animationDelay: '-3s' }} />
+        <div className="absolute -bottom-40 left-1/4 w-80 h-80 rounded-full bg-purple-500/10 blur-3xl opacity-70 animate-float-slow" style={{ animationDelay: '-5s' }} />
 
         {/* Floating Ambient Math Glyphs */}
         <div className="absolute top-24 left-[10%] text-slate-800/20 text-7xl font-mono select-none font-bold animate-float">∫</div>
