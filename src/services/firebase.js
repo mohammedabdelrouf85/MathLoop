@@ -120,6 +120,42 @@ export async function signInWithGoogle() {
 }
 
 /**
+ * Direct Gmail / Email Login with Cloud Progress Sync
+ */
+export async function loginWithGmailAccount(email, displayName = '') {
+  const cleanEmail = email.toLowerCase().trim();
+  const cleanName = displayName.trim() || cleanEmail.split('@')[0] || 'Math Player';
+  const uid = 'gmail_' + btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '');
+
+  const user = {
+    uid,
+    displayName: cleanName,
+    email: cleanEmail,
+    photoURL: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanEmail)}`,
+    isGuest: false
+  };
+
+  localStorage.setItem('mathloop_user', JSON.stringify(user));
+
+  // Sync / Save to Firestore if available
+  if (isFirebaseConfigured && db) {
+    try {
+      const userRef = doc(db, 'users', uid);
+      await setDoc(userRef, {
+        displayName: cleanName,
+        email: cleanEmail,
+        photoURL: user.photoURL,
+        lastLogin: Date.now()
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Firestore sync warning:', e);
+    }
+  }
+
+  return user;
+}
+
+/**
  * Update User Name & Gmail / Email Profile Data
  */
 export async function updateUserProfile(currentUser, displayName, email) {
