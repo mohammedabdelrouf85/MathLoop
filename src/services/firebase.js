@@ -120,6 +120,41 @@ export async function signInWithGoogle() {
 }
 
 /**
+ * Update User Name & Gmail / Email Profile Data
+ */
+export async function updateUserProfile(currentUser, displayName, email) {
+  const activeUser = currentUser || getOrCreateLocalUser();
+  const cleanEmail = email ? email.trim() : (activeUser.email || 'player@mathloop.local');
+  const cleanName = displayName ? displayName.trim() : (activeUser.displayName || 'Math Master');
+
+  const updatedUser = {
+    ...activeUser,
+    displayName: cleanName,
+    email: cleanEmail,
+    photoURL: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanEmail || cleanName || 'mathloop')}`,
+    isGuest: activeUser.isGuest ?? true
+  };
+
+  localStorage.setItem('mathloop_user', JSON.stringify(updatedUser));
+
+  if (isFirebaseConfigured && db && !updatedUser.isGuest && updatedUser.uid) {
+    try {
+      const userRef = doc(db, 'users', updatedUser.uid);
+      await setDoc(userRef, {
+        displayName: updatedUser.displayName,
+        email: updatedUser.email,
+        photoURL: updatedUser.photoURL,
+        updatedAt: Date.now()
+      }, { merge: true });
+    } catch (e) {
+      console.warn('Firestore profile update failed, saved locally:', e);
+    }
+  }
+
+  return updatedUser;
+}
+
+/**
  * Sign out user
  */
 export async function logoutUser() {
