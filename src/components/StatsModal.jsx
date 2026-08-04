@@ -56,11 +56,23 @@ export default function StatsModal({ isOpen, onClose, userStats }) {
             </div>
 
             <div className="p-3.5 rounded-2xl bg-slate-900 border border-slate-800 text-center">
-              <Flame className="w-5 h-5 text-fire-glow mx-auto mb-1" />
+              <Flame className="w-5 h-5 text-emerald-400 mx-auto mb-1" />
               <div className="text-xs text-slate-400 font-semibold">Total Points</div>
               <div className="text-xl font-mono font-extrabold text-white">
                 {userStats?.totalPoints || 0}
               </div>
+            </div>
+          </div>
+
+          {/* Highest Rank & Date Achieved History Card */}
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-left flex items-center justify-between text-xs">
+            <div>
+              <span className="text-slate-400 font-semibold block">Best Rank History:</span>
+              <span className="text-amber-300 font-bold font-mono text-sm">{userStats?.bestRank || '#1 Global Rank'}</span>
+            </div>
+            <div className="text-right text-slate-400 text-[11px] font-mono">
+              <span>Achieved on</span>
+              <span className="block text-amber-200 font-bold">{userStats?.updatedAtDate || userStats?.bestRankDate || 'Today'}</span>
             </div>
           </div>
         </motion.div>

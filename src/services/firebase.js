@@ -77,10 +77,10 @@ export function getOrCreateLocalUser() {
   
   const defaultUser = {
     uid: 'device_' + (Math.random().toString(36).substring(2, 9)),
-    displayName: 'Math Master',
-    email: 'player@mathloop.local',
-    photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=mathloop',
-    isGuest: true
+    displayName: 'Mohammed Abdelraouf',
+    email: 'mohammedabdelrouf85@gmail.com',
+    photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=mohammedabdelrouf85@gmail.com',
+    isGuest: false
   };
   localStorage.setItem('mathloop_user', JSON.stringify(defaultUser));
   return defaultUser;
@@ -93,10 +93,10 @@ export async function signInWithGoogle() {
   if (!isFirebaseConfigured || !auth) {
     const guestUser = {
       uid: 'google_user_' + Math.random().toString(36).substring(2, 9),
-      displayName: 'Google Player',
-      email: 'user@gmail.com',
-      photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=googleplayer',
-      isGuest: true
+      displayName: 'Mohammed Abdelraouf',
+      email: 'mohammedabdelrouf85@gmail.com',
+      photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=mohammedabdelrouf85@gmail.com',
+      isGuest: false
     };
     localStorage.setItem('mathloop_user', JSON.stringify(guestUser));
     return guestUser;
@@ -123,8 +123,8 @@ export async function signInWithGoogle() {
  * Direct Gmail / Email Login with Cloud Progress Sync
  */
 export async function loginWithGmailAccount(email, displayName = '') {
-  const cleanEmail = email.toLowerCase().trim();
-  const cleanName = displayName.trim() || cleanEmail.split('@')[0] || 'Math Player';
+  const cleanEmail = email.toLowerCase().trim() || 'mohammedabdelrouf85@gmail.com';
+  const cleanName = displayName.trim() || 'Mohammed Abdelraouf';
   const uid = 'gmail_' + btoa(cleanEmail).replace(/[^a-zA-Z0-9]/g, '');
 
   const user = {
@@ -160,20 +160,20 @@ export async function loginWithGmailAccount(email, displayName = '') {
  */
 export async function updateUserProfile(currentUser, displayName, email) {
   const activeUser = currentUser || getOrCreateLocalUser();
-  const cleanEmail = email ? email.trim() : (activeUser.email || 'player@mathloop.local');
-  const cleanName = displayName ? displayName.trim() : (activeUser.displayName || 'Math Master');
+  const cleanEmail = email ? email.trim() : (activeUser.email || 'mohammedabdelrouf85@gmail.com');
+  const cleanName = displayName ? displayName.trim() : (activeUser.displayName || 'Mohammed Abdelraouf');
 
   const updatedUser = {
     ...activeUser,
     displayName: cleanName,
     email: cleanEmail,
     photoURL: `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(cleanEmail || cleanName || 'mathloop')}`,
-    isGuest: activeUser.isGuest ?? true
+    isGuest: false
   };
 
   localStorage.setItem('mathloop_user', JSON.stringify(updatedUser));
 
-  if (isFirebaseConfigured && db && !updatedUser.isGuest && updatedUser.uid) {
+  if (isFirebaseConfigured && db && updatedUser.uid) {
     try {
       const userRef = doc(db, 'users', updatedUser.uid);
       await setDoc(userRef, {
@@ -233,21 +233,28 @@ export function subscribeToAuthState(callback) {
 }
 
 /**
- * Save user progression (High Score, Level, Coins, Tickets)
+ * Save user progression (High Score, Level, Coins, Tickets, Date, Best Rank)
  */
 export async function syncUserData(user, statsData) {
   const activeUser = user || getOrCreateLocalUser();
   if (!activeUser) return;
 
+  const now = new Date();
+  const dateFormatted = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   const dataToSave = {
-    displayName: activeUser.displayName,
+    displayName: activeUser.displayName || 'Mohammed Abdelraouf',
+    email: activeUser.email || 'mohammedabdelrouf85@gmail.com',
     photoURL: activeUser.photoURL,
     updatedAt: Date.now(),
+    updatedAtDate: dateFormatted,
     highScore: statsData.highScore || 0,
     totalPoints: statsData.totalPoints || 0,
     highLevel: statsData.highLevel || 1,
     coins: statsData.coins || 0,
     tickets: statsData.tickets ?? 5,
+    bestRank: statsData.bestRank || '#1',
+    bestRankDate: statsData.bestRankDate || dateFormatted,
     lastRegenTimestamp: statsData.lastRegenTimestamp || Date.now()
   };
 
@@ -256,7 +263,7 @@ export async function syncUserData(user, statsData) {
   localStorage.setItem(`mathloop_global_stats`, JSON.stringify(dataToSave));
 
   // Firestore save if configured & not guest
-  if (isFirebaseConfigured && db && !activeUser.isGuest) {
+  if (isFirebaseConfigured && db) {
     try {
       const userRef = doc(db, 'users', activeUser.uid);
       await setDoc(userRef, dataToSave, { merge: true });
@@ -273,11 +280,14 @@ export async function fetchUserData(user) {
   const activeUser = user || getOrCreateLocalUser();
   if (!activeUser) return null;
 
+  const now = new Date();
+  const dateFormatted = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   // Check local storage first
   const localStats = localStorage.getItem(`mathloop_stats_${activeUser.uid}`) || localStorage.getItem(`mathloop_global_stats`);
   let stats = localStats ? JSON.parse(localStats) : null;
 
-  if (isFirebaseConfigured && db && !activeUser.isGuest) {
+  if (isFirebaseConfigured && db) {
     try {
       const userRef = doc(db, 'users', activeUser.uid);
       const snap = await getDoc(userRef);
@@ -295,14 +305,19 @@ export async function fetchUserData(user) {
     highLevel: 1,
     coins: 50, // Welcome gift
     tickets: 5,
+    bestRank: '#1',
+    bestRankDate: dateFormatted,
     lastRegenTimestamp: Date.now()
   };
 }
 
 /**
- * Fetch Global Leaderboard rankings
+ * Fetch Global Leaderboard rankings with Date stamps
  */
 export async function fetchGlobalLeaderboard() {
+  const now = new Date();
+  const dateFormatted = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
   if (isFirebaseConfigured && db) {
     try {
       const usersRef = collection(db, 'users');
@@ -310,7 +325,12 @@ export async function fetchGlobalLeaderboard() {
       const querySnapshot = await getDocs(q);
       const leaderboard = [];
       querySnapshot.forEach((doc) => {
-        leaderboard.push({ id: doc.id, ...doc.data() });
+        const data = doc.data();
+        leaderboard.push({ 
+          id: doc.id, 
+          ...data,
+          updatedAtDate: data.updatedAtDate || dateFormatted
+        });
       });
       if (leaderboard.length > 0) return leaderboard;
     } catch (e) {
@@ -318,12 +338,12 @@ export async function fetchGlobalLeaderboard() {
     }
   }
 
-  // Fallback high quality simulated leaderboard
+  // Fallback high quality simulated leaderboard with dates
   return [
-    { id: '1', displayName: 'Albert E.', highScore: 4850, highLevel: 42, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Albert' },
-    { id: '2', displayName: 'Ada Lovelace', highScore: 3920, highLevel: 36, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ada' },
-    { id: '3', displayName: 'Pythagoras', highScore: 3410, highLevel: 31, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pythagoras' },
-    { id: '4', displayName: 'Euler Master', highScore: 2980, highLevel: 27, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Euler' },
-    { id: '5', displayName: 'Hypatia Math', highScore: 2450, highLevel: 22, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Hypatia' },
+    { id: '1', displayName: 'Mohammed Abdelraouf', highScore: 5200, highLevel: 45, photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=mohammedabdelrouf85@gmail.com', updatedAtDate: dateFormatted },
+    { id: '2', displayName: 'Albert E.', highScore: 4850, highLevel: 42, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Albert', updatedAtDate: 'Aug 3, 2026' },
+    { id: '3', displayName: 'Ada Lovelace', highScore: 3920, highLevel: 36, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ada', updatedAtDate: 'Aug 2, 2026' },
+    { id: '4', displayName: 'Pythagoras', highScore: 3410, highLevel: 31, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Pythagoras', updatedAtDate: 'Jul 28, 2026' },
+    { id: '5', displayName: 'Euler Master', highScore: 2980, highLevel: 27, photoURL: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Euler', updatedAtDate: 'Jul 25, 2026' },
   ];
 }

@@ -10,6 +10,14 @@
       radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.08) 0%, transparent 45%),
       radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.04) 0%, transparent 60%);
   }
+
+  button, input, select, a {
+    -webkit-tap-highlight-color: transparent !important;
+    outline: none !important;
+  }
+  button:focus, button:focus-visible, button:active {
+    outline: none !important;
+  }
 }
 
 /* Background Cyber Grid Pattern */

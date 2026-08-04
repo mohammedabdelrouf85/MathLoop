@@ -447,9 +447,9 @@ export default function GameCard({
                 {question.type === 'add' && '➕ ADDITION'}
               </span>
             </div>
-            <div className="text-3xl sm:text-5xl font-black font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-white to-cyan-300 drop-shadow-md flex items-center justify-center gap-2">
+            <div className="text-3xl sm:text-5xl font-black font-mono tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-white to-cyan-300 drop-shadow-md flex items-center justify-center gap-2 select-none">
               <span dangerouslySetInnerHTML={{ __html: question.promptText }} />
-              <span>= ?</span>
+              {!question.promptText.includes('=') && <span>= ?</span>}
             </div>
 
             {/* Input display in Keypad Mode */}
@@ -467,7 +467,7 @@ export default function GameCard({
                 playClickSound();
                 setInputMode(inputMode === 'choice' ? 'keypad' : 'choice');
               }}
-              className="text-xs text-slate-400 hover:text-emerald-300 flex items-center gap-1.5 transition px-2.5 py-1 rounded-lg hover:bg-slate-800/60"
+              className="text-xs text-slate-400 hover:text-emerald-300 flex items-center gap-1.5 transition px-2.5 py-1 rounded-lg hover:bg-slate-800/60 focus:outline-none focus:ring-0"
             >
               {inputMode === 'choice' ? (
                 <>
@@ -496,7 +496,7 @@ export default function GameCard({
                       playClickSound();
                       handleAnswer(choice);
                     }}
-                    className={`py-4 px-4 rounded-2xl font-mono text-2xl font-black transition-all border shadow-lg relative group ${
+                    className={`py-4 px-4 rounded-2xl font-mono text-2xl font-black transition-all border shadow-lg relative group focus:outline-none focus:ring-0 active:outline-none select-none ${
                       isDisabled
                         ? 'bg-slate-900/30 text-slate-700 border-slate-800/40 cursor-not-allowed line-through'
                         : isFireMode
@@ -524,7 +524,7 @@ export default function GameCard({
                       playClickSound();
                       setUserInput((prev) => (prev.length < 5 ? prev + num : prev));
                     }}
-                    className="py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-mono font-bold text-xl border border-slate-800 active:bg-emerald-600 transition shadow-sm"
+                    className="py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-mono font-bold text-xl border border-slate-800 active:bg-emerald-600 transition shadow-sm focus:outline-none focus:ring-0"
                   >
                     {num}
                   </button>
@@ -536,7 +536,7 @@ export default function GameCard({
                     playClickSound();
                     setUserInput((prev) => prev.slice(0, -1));
                   }}
-                  className="py-3 rounded-xl bg-slate-900 hover:bg-rose-900/30 text-rose-300 font-bold text-sm border border-slate-800 transition"
+                  className="py-3 rounded-xl bg-slate-900 hover:bg-rose-900/30 text-rose-300 font-bold text-sm border border-slate-800 transition focus:outline-none focus:ring-0"
                 >
                   ⌫
                 </button>
@@ -545,7 +545,7 @@ export default function GameCard({
                     playClickSound();
                     setUserInput((prev) => (prev.length < 5 ? prev + '0' : prev));
                   }}
-                  className="py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-mono font-bold text-xl border border-slate-800 transition"
+                  className="py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-mono font-bold text-xl border border-slate-800 transition focus:outline-none focus:ring-0"
                 >
                   0
                 </button>
@@ -554,7 +554,7 @@ export default function GameCard({
                     playClickSound();
                     if (userInput !== '') handleAnswer(userInput);
                   }}
-                  className="py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 font-bold text-sm shadow-glow-emerald transition"
+                  className="py-3 rounded-xl bg-gradient-to-r from-emerald-400 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 font-bold text-sm shadow-glow-emerald transition focus:outline-none focus:ring-0"
                 >
                   ↵ OK
                 </button>
@@ -568,7 +568,7 @@ export default function GameCard({
             <button
               onClick={handleUseHint}
               disabled={disabledChoices.length > 0 || coins < 15}
-              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-amber-500/10 border border-slate-800 hover:border-amber-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group"
+              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-amber-500/10 border border-slate-800 hover:border-amber-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group focus:outline-none focus:ring-0"
               title="Eliminates 2 incorrect choices (15 🪙)"
             >
               <Lightbulb className="w-4 h-4 text-amber-400 group-hover:scale-110 transition-transform" />
@@ -580,7 +580,7 @@ export default function GameCard({
             <button
               onClick={handleAddTime}
               disabled={coins < 20}
-              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-emerald-500/10 border border-slate-800 hover:border-emerald-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group"
+              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-emerald-500/10 border border-slate-800 hover:border-emerald-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group focus:outline-none focus:ring-0"
               title="Adds 10 seconds to clock (20 🪙)"
             >
               <PlusCircle className="w-4 h-4 text-emerald-400 group-hover:scale-110 transition-transform" />
@@ -592,7 +592,7 @@ export default function GameCard({
             <button
               onClick={handleFreezeTimer}
               disabled={coins < 25 || isFrozen}
-              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-cyan-500/10 border border-slate-800 hover:border-cyan-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group"
+              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-cyan-500/10 border border-slate-800 hover:border-cyan-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group focus:outline-none focus:ring-0"
               title="Freezes timer countdown for 10s (25 🪙)"
             >
               <Snowflake className="w-4 h-4 text-cyan-400 group-hover:scale-110 transition-transform" />
@@ -603,13 +603,13 @@ export default function GameCard({
             {/* Skip */}
             <button
               onClick={handleSkipQuestion}
-              disabled={coins < 30}
-              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-purple-500/10 border border-slate-800 hover:border-purple-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group"
-              title="Skip question safely without losing streak (30 🪙)"
+              disabled={coins < 50}
+              className="flex-1 py-2.5 px-2 rounded-2xl bg-slate-900/70 hover:bg-purple-500/10 border border-slate-800 hover:border-purple-500/40 text-slate-300 flex flex-col items-center gap-0.5 transition disabled:opacity-35 disabled:cursor-not-allowed group focus:outline-none focus:ring-0"
+              title="Skip question safely without losing streak (50 🪙)"
             >
               <SkipForward className="w-4 h-4 text-purple-400 group-hover:scale-110 transition-transform" />
               <span className="text-[11px] font-semibold">Skip</span>
-              <span className="text-[10px] text-amber-300 font-bold font-mono">30 🪙</span>
+              <span className="text-[10px] text-amber-300 font-bold font-mono">50 🪙</span>
             </button>
           </div>
         </motion.div>

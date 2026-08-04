@@ -113,8 +113,13 @@ export default function LeaderboardModal({ isOpen, onClose, user, userHighScore 
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-400">
-                          Level {item.highLevel || 1}
+                        <div className="text-[11px] text-slate-400 flex items-center gap-2">
+                          <span>Level {item.highLevel || 1}</span>
+                          {item.updatedAtDate && (
+                            <span className="text-[10px] text-slate-500 font-mono">
+                              • {item.updatedAtDate}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -129,9 +134,12 @@ export default function LeaderboardModal({ isOpen, onClose, user, userHighScore 
             )}
           </div>
 
-          {/* Footer User Rank Summary */}
+          {/* Footer User Rank Summary with Date */}
           <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-slate-300">
-            <span>Your Personal Best:</span>
+            <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+              <Crown className="w-4 h-4 text-amber-400" />
+              <span>Highest Rank Record: #1</span>
+            </div>
             <span className="text-amber-400 font-mono font-bold text-sm">{userHighScore} PTS</span>
           </div>
         </motion.div>

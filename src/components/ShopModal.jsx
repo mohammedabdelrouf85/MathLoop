@@ -41,7 +41,7 @@ export default function ShopModal({ isOpen, onClose, coins, onEarnCoins }) {
       icon: SkipForward,
       color: 'text-purple-400',
       bgColor: 'bg-purple-500/10 border-purple-500/30',
-      price: 30
+      price: 50
     }
   ];
 
